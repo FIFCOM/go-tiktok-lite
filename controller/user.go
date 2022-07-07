@@ -1,9 +1,10 @@
 package controller
 
 import (
+	"github.com/FIFCOM/go-tiktok-lite/dao"
+	"github.com/FIFCOM/go-tiktok-lite/service"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"sync/atomic"
 )
 
 // usersLoginInfo use map to store user info, and key is username+password for demo
@@ -18,8 +19,6 @@ var usersLoginInfo = map[string]User{
 		IsFollow:      true,
 	},
 }
-
-var userIdSequence = int64(1)
 
 type UserLoginResponse struct {
 	Response
@@ -36,23 +35,25 @@ func Register(c *gin.Context) {
 	username := c.Query("username")
 	password := c.Query("password")
 
-	token := username + password
-
-	if _, exist := usersLoginInfo[token]; exist {
+	svc := service.UserSvc{}
+	// 首先使用用户名查询用户是否存在
+	user := svc.GetUserByName(username)
+	if user.Name == username {
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 1, StatusMsg: "User already exist"},
 		})
 	} else {
-		atomic.AddInt64(&userIdSequence, 1)
-		newUser := User{
-			Id:   userIdSequence,
-			Name: username,
+		// 如果不存在该用户则可以注册
+		newUser := dao.User{
+			Name:     username,
+			Password: service.Hash(password), // 散列化密码
 		}
-		usersLoginInfo[token] = newUser
+		svc.InsertUser(&newUser)              // 向数据库中插入用户
+		newUser = svc.GetUserByName(username) // 获取新注册的用户(包括Id等)
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0},
-			UserId:   userIdSequence,
-			Token:    username + password,
+			UserId:   newUser.Id,
+			Token:    service.GetToken(newUser), // 生成token
 		})
 	}
 }
@@ -61,9 +62,12 @@ func Login(c *gin.Context) {
 	username := c.Query("username")
 	password := c.Query("password")
 
-	token := username + password
-
-	if user, exist := usersLoginInfo[token]; exist {
+	svc := service.UserSvc{}
+	user := svc.GetUserByName(username) // 获取用户信息
+	// 判断用户信息的密码和获取到的加密后的密码是否相同
+	if user.Password == service.Hash(password) {
+		// 如果相同则登录成功，生成Token
+		token := service.GetToken(user)
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0},
 			UserId:   user.Id,
@@ -71,7 +75,7 @@ func Login(c *gin.Context) {
 		})
 	} else {
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: 1, StatusMsg: "User doesn't exist"},
+			Response: Response{StatusCode: 1, StatusMsg: "Username or Password Error"},
 		})
 	}
 }
