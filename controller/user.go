@@ -5,20 +5,13 @@ import (
 	"github.com/FIFCOM/go-tiktok-lite/service"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 // usersLoginInfo use map to store user info, and key is username+password for demo
 // user data will be cleared every time the server starts
 // test data: username=zhanglei, password=douyin
-var usersLoginInfo = map[string]User{
-	"zhangleidouyin": {
-		Id:            1,
-		Name:          "zhanglei",
-		FollowCount:   10,
-		FollowerCount: 5,
-		IsFollow:      true,
-	},
-}
+var usersLoginInfo = map[string]User{}
 
 type UserLoginResponse struct {
 	Response
@@ -83,10 +76,15 @@ func Login(c *gin.Context) {
 func UserInfo(c *gin.Context) {
 	token := c.Query("token")
 	userId := c.Query("user_id")
-	parsedUser, _ := service.ParseToken(token)
-	println(parsedUser.Id)
-	println(userId)
-	if user, exist := usersLoginInfo[token]; exist {
+	daoUser, _ := service.ParseToken(token)
+	user := User{
+		Id:            daoUser.Id,
+		Name:          daoUser.Name,
+		FollowCount:   114514, // TODO: 获取用户关注数量
+		FollowerCount: 114514, // TODO: 获取用户粉丝数量
+		IsFollow:      false,  // TODO: 获取该用户是否已关注
+	}
+	if userId == strconv.FormatInt(daoUser.Id, 10) {
 		c.JSON(http.StatusOK, UserResponse{
 			Response: Response{StatusCode: 0},
 			User:     user,

@@ -17,16 +17,16 @@ import (
 
 // GetToken 生成用户token
 func GetToken(user dao.User) string {
-	token, err := Encrypt([]byte(strconv.FormatInt(user.Id, 10)), []byte(Hash(config.Secret)))
+	token, err := Encrypt(strconv.FormatInt(user.Id, 10), Hash(config.Secret))
 	Handle(err)
 	return token
 }
 
 // ParseToken 解析用户token，返回dao.User
 func ParseToken(token string) (user dao.User, err error) {
-	id, err := Decrypt(token, []byte(Hash(config.Secret)))
+	id, err := Decrypt(token, Hash(config.Secret))
 	Handle(err)
-	user.Id, err = strconv.ParseInt(string(id), 10, 64)
+	user.Id, err = strconv.ParseInt(id, 10, 64)
 	Handle(err)
 	return dao.GetUserById(user.Id)
 }
@@ -39,9 +39,10 @@ func Hash(s string) string {
 	return fmt.Sprintf("%x", hash.Sum(nil))
 }
 
-// Encrypt encrypts data using 256-bit AES-GCM, return base62 encoded string
-func Encrypt(plain []byte, key []byte) (ciphered string, err error) {
-	k := sha256.Sum256(key)
+// Encrypt 使用AES-GCM-256加密数据，并返回base62编码的字符串
+func Encrypt(data string, key string) (ciphered string, err error) {
+	plain := []byte(data)
+	k := sha256.Sum256([]byte(key))
 	block, err := aes.NewCipher(k[:])
 	if err != nil {
 		return "", err
@@ -56,14 +57,14 @@ func Encrypt(plain []byte, key []byte) (ciphered string, err error) {
 		return "", err
 	}
 	sealed := gcm.Seal(nonce, nonce, plain, nil)
-	ciphered = base62.EncodeToString(sealed) // base62 encode sealed text
+	ciphered = base62.EncodeToString(sealed) // 使用base62编码
 	return ciphered, nil
 }
 
-// Decrypt decode data using base62 and decrypt data using 256-bit AES-GCM, return base62 encoded string
-func Decrypt(ciphered string, key []byte) (plain string, err error) {
-	k := sha256.Sum256(key)                          // sha256 hash key
-	ciphertext, err := base62.DecodeString(ciphered) // base62 decode ciphered text
+// Decrypt 使用AES-GCM-256解密字符串，并返回解密后的原始数据
+func Decrypt(ciphered string, key string) (plain string, err error) {
+	k := sha256.Sum256([]byte(key))                  // 使用sha256哈希key
+	ciphertext, err := base62.DecodeString(ciphered) // 使用base62解码
 	if err != nil {
 		return "", err
 	}
@@ -76,7 +77,7 @@ func Decrypt(ciphered string, key []byte) (plain string, err error) {
 		return "", err
 	}
 	if len(ciphertext) < gcm.NonceSize() {
-		return "", errors.New("malformed ciphertext")
+		return "", errors.New("无法解密：无效密文")
 	}
 	opened, err := gcm.Open(nil, ciphertext[:gcm.NonceSize()], ciphertext[gcm.NonceSize():], nil)
 	return string(opened), err
