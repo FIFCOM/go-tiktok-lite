@@ -82,7 +82,10 @@ func Login(c *gin.Context) {
 
 func UserInfo(c *gin.Context) {
 	token := c.Query("token")
-
+	userId := c.Query("user_id")
+	parsedUser, _ := service.ParseToken(token)
+	println(parsedUser.Id)
+	println(userId)
 	if user, exist := usersLoginInfo[token]; exist {
 		c.JSON(http.StatusOK, UserResponse{
 			Response: Response{StatusCode: 0},
