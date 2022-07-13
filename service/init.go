@@ -85,6 +85,6 @@ func Decrypt(ciphered string, key string) (plain string, err error) {
 
 func Handle(e error) {
 	if e != nil {
-		log.Panicf("[ERR] Tiktok DAO Layer Error : %v", e)
+		log.Panicf("[ERR] Tiktok Service Layer Error : %v", e)
 	}
 }

@@ -10,7 +10,6 @@ import (
 
 // usersLoginInfo use map to store user info, and key is username+password for demo
 // user data will be cleared every time the server starts
-// test data: username=zhanglei, password=douyin
 var usersLoginInfo = map[string]User{}
 
 type UserLoginResponse struct {
@@ -77,12 +76,13 @@ func UserInfo(c *gin.Context) {
 	token := c.Query("token")
 	userId := c.Query("user_id")
 	daoUser, _ := service.ParseToken(token)
+	svc := service.RelationSvc{}
 	user := User{
 		Id:            daoUser.Id,
 		Name:          daoUser.Name,
-		FollowCount:   114514, // TODO: 获取用户关注数量
-		FollowerCount: 114514, // TODO: 获取用户粉丝数量
-		IsFollow:      false,  // TODO: 获取该用户是否已关注
+		FollowCount:   svc.LenUserFocus(daoUser.Id),
+		FollowerCount: svc.LenUserFans(daoUser.Id),
+		IsFollow:      false, // TODO: 获取该用户是否已关注
 	}
 	if userId == strconv.FormatInt(daoUser.Id, 10) {
 		c.JSON(http.StatusOK, UserResponse{
