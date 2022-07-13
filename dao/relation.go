@@ -31,15 +31,16 @@ func GetUserFans(id int64) ([]Follower, error) {
 }
 
 // InsertFocus 插入数据
-func InsertFocus(follow *Follow) error {
+func InsertFocus(follow *Follow, follower *Follower) error {
 	err := DB.Create(follow).Error
+	Handle(err)
+	err = DB.Create(follower).Error
 	Handle(err)
 	return err
 }
 
 // DeleteFocus 删除数据
-func DeleteFocus(follower *Follow) error {
-	err := DB.Delete(&follower).Error
-	Handle(err)
-	return err
+func DeleteFocus(follow *Follow, follower *Follower) {
+	DB.Where("user_id = ? AND focus_id = ?", follow.UserId, follow.FocusId).Delete(&follow)
+	DB.Where("user_id = ? AND fans_id = ?", follower.UserId, follower.FansId).Delete(&follower)
 }

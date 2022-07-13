@@ -1,6 +1,8 @@
 package service
 
-import "github.com/FIFCOM/go-tiktok-lite/dao"
+import (
+	"github.com/FIFCOM/go-tiktok-lite/dao"
+)
 
 type RelationSvc struct {
 }
@@ -31,15 +33,13 @@ func (us *RelationSvc) LenUserFans(id int64) int64 {
 
 // RelationAction 关注或取消关注操作，传入当前用户，目标用户，操作类型
 func (us *RelationSvc) RelationAction(userId int64, toUserId int64, actionType int64) {
-	follow := dao.Follow{
-		UserId:  userId,
-		FocusId: toUserId,
-	}
 	if actionType == 1 {
 		// 关注
-		_ = dao.InsertFocus(&follow)
+		_ = dao.InsertFocus(&dao.Follow{UserId: userId, FocusId: toUserId},
+			&dao.Follower{UserId: toUserId, FansId: userId})
 	} else {
 		//取消 关注
-		_ = dao.DeleteFocus(&follow)
+		dao.DeleteFocus(&dao.Follow{UserId: userId, FocusId: toUserId},
+			&dao.Follower{UserId: toUserId, FansId: userId})
 	}
 }

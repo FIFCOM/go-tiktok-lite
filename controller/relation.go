@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/FIFCOM/go-tiktok-lite/service"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -33,6 +34,7 @@ func RelationAction(c *gin.Context) {
 	actionTypeString := c.Query("action_type")
 	actionType, _ := strconv.ParseInt(actionTypeString, 10, 64)
 
+	fmt.Println(userId, toUserId, actionType)
 	// 根据actionType来选择关注或者取关
 	svcR.RelationAction(userId, toUserId, actionType)
 	c.JSON(http.StatusOK, Response{StatusCode: 0})
