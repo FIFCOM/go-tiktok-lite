@@ -1,14 +1,8 @@
 package service
 
-import "github.com/FIFCOM/go-tiktok-lite/dao"
-
-type User struct {
-	Id            int    `json:"id,omitempty"`
-	Name          string `json:"name,omitempty"`
-	FollowCount   int64  `json:"follow_count"`
-	FollowerCount int64  `json:"follower_count"`
-	IsFollow      bool   `json:"is_follow"`
-}
+import (
+	"github.com/FIFCOM/go-tiktok-lite/dao"
+)
 
 type UserSvc struct {
 }
