@@ -43,3 +43,8 @@ func (us *RelationSvc) RelationAction(userId int64, toUserId int64, actionType i
 		dao.DeleteFocus(&dao.Follow{UserId: userId, FocusId: toUserId})
 	}
 }
+
+// IsFollow 判断myId有没有关注toId
+func (us *RelationSvc) IsFollow(myId, toId int64) bool {
+	return dao.IsFollow(myId, toId)
+}

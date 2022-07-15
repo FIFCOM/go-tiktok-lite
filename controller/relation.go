@@ -60,7 +60,7 @@ func FollowList(c *gin.Context) {
 			Name:          svcU.GetUserById(followUserId).Name,
 			FollowCount:   svcR.LenUserFocus(followUserId),
 			FollowerCount: svcR.LenUserFans(followUserId),
-			IsFollow:      true,
+			IsFollow:      true, // 这里本来调用的就是关注了的，所以就是true
 		}
 		userList = append(userList, tmp)
 	}
@@ -96,7 +96,7 @@ func FollowerList(c *gin.Context) {
 			Name:          svcU.GetUserById(followerUserId).Name,
 			FollowCount:   svcR.LenUserFocus(followerUserId),
 			FollowerCount: svcR.LenUserFans(followerUserId),
-			IsFollow:      true,
+			IsFollow:      svcR.IsFollow(daoUser.Id, followerUserId), //判断一下当前粉丝，自己有没有关注他
 		}
 		userList = append(userList, tmp)
 	}

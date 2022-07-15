@@ -34,3 +34,10 @@ func InsertFocus(follow *Follow) error {
 func DeleteFocus(follow *Follow) {
 	DB.Where("user_id = ? AND focus_id = ?", follow.UserId, follow.FocusId).Delete(&follow)
 }
+
+// IsFollow 判断myId有没有关注toId
+func IsFollow(myId, toId int64) bool {
+	var follow Follow
+	err := DB.Where("user_id = ? AND focus_id = ?", myId, toId).First(&follow).Error
+	return err == nil
+}
