@@ -1,7 +1,9 @@
 package dao
 
 import (
+	"fmt"
 	"github.com/FIFCOM/go-tiktok-lite/config"
+	"os/exec"
 	"strconv"
 	"time"
 )
@@ -37,4 +39,19 @@ func GetVideoListByTime(time time.Time) ([]Video, error) {
 		Find(&videos).Error
 	Handle(err)
 	return videos, err
+}
+
+func InsertVideo(video *Video) error {
+	err := DB.Create(&video).Error
+	Handle(err)
+	return err
+}
+
+func SaveCover(filename string) error {
+	// 使用ffmpeg提取视频第一帧作为封面
+	cmd := exec.Command("ffmpeg", "-i", filename, "-vframes", "1", fmt.Sprintf("../public/cover/%s.png", filename))
+	cmd.Dir = "./tools/"
+	err := cmd.Run()
+	Handle(err)
+	return err
 }
