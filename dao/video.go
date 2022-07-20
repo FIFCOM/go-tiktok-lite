@@ -3,6 +3,8 @@ package dao
 import (
 	"fmt"
 	"github.com/FIFCOM/go-tiktok-lite/config"
+	"github.com/gin-gonic/gin"
+	"mime/multipart"
 	"os/exec"
 	"strconv"
 	"time"
@@ -47,11 +49,19 @@ func InsertVideo(video *Video) error {
 	return err
 }
 
-func SaveCover(filename string) error {
-	// 使用ffmpeg提取视频第一帧作为封面
-	cmd := exec.Command("ffmpeg", "-i", filename, "-vframes", "1", fmt.Sprintf("../public/cover/%s.png", filename))
-	cmd.Dir = "./tools/"
-	err := cmd.Run()
+func SaveVideo(c *gin.Context, data *multipart.FileHeader, path string) error {
+	// 保存视频
+	err := c.SaveUploadedFile(data, path)
 	Handle(err)
 	return err
+}
+
+func SaveCover(filename string, filetype string) string {
+	// 使用ffmpeg提取视频第一帧作为封面
+	inputFile := fmt.Sprintf(config.Video["video_dir_fmt"], filename, filetype)
+	outputDir := fmt.Sprintf(config.Video["cover_dir_fmt"], filename)
+	cmd := exec.Command("./tools/ffmpeg", "-i", inputFile, "-vframes", "1", outputDir)
+	err := cmd.Run()
+	Handle(err)
+	return filename + ".png"
 }

@@ -11,10 +11,18 @@ var DB = map[string]string{
 
 // Video 视频配置
 var Video = map[string]string{
-	"limit":        "20",                            // 视频流最多展示的视频数量
-	"video_prefix": "https://api.fifcom.cn/vid/",    // 视频url前缀
-	"cover_prefix": "https://www.fifcom.cn/avatar/", // 封面url前缀
+	"limit":         "20",                    // 视频流最多展示的视频数量
+	"video_prefix":  "",                      // 视频url前缀，不填则自动设置为本地ip
+	"cover_prefix":  "",                      // 封面url前缀，不填则自动设置为本地ip
+	"video_dir_fmt": "./public/video/%s%s",   // 视频存放目录。
+	"cover_dir_fmt": "./public/cover/%s.png", // 封面存放目录。
 }
 
 // Secret 密钥，用于加密的盐
 var Secret = "test-secret-credential"
+
+// Port 监听端口
+var Port = ":8080"
+
+// NetEnv 网络环境，internal表示内网，external表示外网
+var NetEnv = "internal"

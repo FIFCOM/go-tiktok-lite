@@ -35,26 +35,26 @@ create table videos(
     primary key(id)
 ) engine=InnoDB default charset=utf8 comment '视频表';
 # 测试视频1：aaa发布了"测试视频1",
-# 视频地址为："https://api.fifcom.cn/vid/1.mp4",
-# 封面地址为："https://www.fifcom.cn/avatar/",
+# 视频地址为："http://localhost:8080/douyin/video/test1.mp4",
+# 封面地址为："http://localhost:8080/douyin/cover/test1.png",
 # 发布时间为："2022-01-01 00:00:00";
 insert into videos(user_id,title,video_url,cover_url,publish_time)
-values(1,'测试视频1','1.mp4','img/raw/512.png','2022-01-01 00:00:00');
+values(1,'测试视频1','test1.mp4','test1.png','2022-01-01 00:00:00');
 # 测试视频2：bbb发布了"测试视频2",
-# 视频地址为："https://api.fifcom.cn/vid/2.mp4",
-# 封面地址为："https://www.fifcom.cn/avatar/",
+# 视频地址为："http://localhost:8080/douyin/video/test2.mp4",
+# 封面地址为："http://localhost:8080/douyin/cover/test2.png",
 # 发布时间为："2022-02-01 00:00:00";
 insert into videos(user_id,title,video_url,cover_url,publish_time)
-values(2,'测试视频2','2.mp4','img/raw/512.png','2022-02-01 00:00:00');
+values(2,'测试视频2','test2.mp4','test2.png','2022-02-01 00:00:00');
 # 测试视频3：ccc发布了"测试视频3",
-# 视频地址为："https://api.fifcom.cn/vid/3.mp4",
-# 封面地址为："https://www.fifcom.cn/avatar/",
+# 视频地址为："http://localhost:8080/douyin/video/test3.mp4",
+# 封面地址为："http://localhost:8080/douyin/cover/test3.png",
 # 发布时间为："2022-03-01 00:00:00";
 insert into videos(user_id,title,video_url,cover_url,publish_time)
-values(3,'测试视频3','3.mp4','img/raw/512.png','2022-03-01 00:00:00');
+values(3,'测试视频3','test3.mp4','test3.png','2022-03-01 00:00:00');
 # 测试视频4：aaa发布了"测试视频4",
-# 视频地址为："https://api.fifcom.cn/vid/4.mp4",
-# 封面地址为："https://www.fifcom.cn/avatar/",
+# 视频地址为："http://localhost:8080/douyin/video/test4.mp4",
+# 封面地址为："http://localhost:8080/douyin/cover/test4.png",
 # 发布时间为："2022-04-01 00:00:00";
 insert into videos(user_id,title,video_url,cover_url,publish_time)
-values(1,'测试视频4','4.mp4','img/raw/512.png','2022-04-01 00:00:00');
+values(1,'测试视频4','test4.mp4','test4.png','2022-04-01 00:00:00');

@@ -11,6 +11,10 @@ func initRouter(r *gin.Engine) {
 
 	apiRouter := r.Group("/douyin")
 
+	// static files
+	apiRouter.Static("/video/", "./public/video/")
+	apiRouter.Static("/cover/", "./public/cover/")
+
 	// basic apis
 	apiRouter.GET("/feed/", controller.Feed)
 	apiRouter.GET("/user/", controller.UserInfo)

@@ -2,11 +2,16 @@ package dao
 
 import (
 	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"github.com/FIFCOM/go-tiktok-lite/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"io"
+	"io/ioutil"
 	"log"
+	"net"
+	"net/http"
 )
 
 var DB *gorm.DB
@@ -20,6 +25,22 @@ func init() {
 	// 连接数据库
 	DB, err = gorm.Open(mysql.Open(conn))
 	Handle(err)
+
+	// 填写Video配置
+	if config.Video["video_prefix"] == "" {
+		if config.NetEnv == "internal" {
+			config.Video["video_prefix"] = "http://" + getInternalIP() + config.Port + "/douyin/video/"
+		} else {
+			config.Video["video_prefix"] = "http://" + getExternalIP() + config.Port + "/douyin/video/"
+		}
+	}
+	if config.Video["cover_prefix"] == "" {
+		if config.NetEnv == "internal" {
+			config.Video["cover_prefix"] = "http://" + getInternalIP() + config.Port + "/douyin/cover/"
+		} else {
+			config.Video["cover_prefix"] = "http://" + getExternalIP() + config.Port + "/douyin/cover/"
+		}
+	}
 }
 
 func Hash(s string) string {
@@ -34,4 +55,34 @@ func Handle(e error) {
 	if e != nil {
 		log.Panicf("[ERR] Tiktok DAO Layer Error : %v", e)
 	}
+}
+
+func getInternalIP() string {
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	Handle(err)
+	defer func(conn net.Conn) {
+		err := conn.Close()
+		Handle(err)
+	}(conn)
+	localAddr := conn.LocalAddr().(*net.UDPAddr).String()
+	addr, _, err := net.SplitHostPort(localAddr)
+	return addr
+}
+
+func getExternalIP() string {
+	type IP struct {
+		Query string
+	}
+	req, err := http.Get("http://ip-api.com/json/")
+	Handle(err)
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		Handle(err)
+	}(req.Body)
+	body, err := ioutil.ReadAll(req.Body)
+	Handle(err)
+	var ip IP
+	err = json.Unmarshal(body, &ip)
+	Handle(err)
+	return ip.Query
 }
