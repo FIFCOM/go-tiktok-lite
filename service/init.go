@@ -31,6 +31,7 @@ func ParseToken(token string) (user dao.User, err error) {
 	return dao.GetUserById(user.Id)
 }
 
+// Hash 哈希字符串
 func Hash(s string) string {
 	// return sha256(s + config.Secret)
 	s += config.Secret
@@ -83,6 +84,7 @@ func Decrypt(ciphered string, key string) (plain string, err error) {
 	return string(opened), err
 }
 
+// Handle 处理错误
 func Handle(e error) {
 	if e != nil {
 		log.Panicf("[ERR] Tiktok Service Layer Error : %v", e)

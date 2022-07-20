@@ -1,9 +1,7 @@
 package dao
 
 import (
-	"crypto/sha256"
 	"encoding/json"
-	"fmt"
 	"github.com/FIFCOM/go-tiktok-lite/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -26,7 +24,7 @@ func init() {
 	DB, err = gorm.Open(mysql.Open(conn))
 	Handle(err)
 
-	// 填写Video配置
+	// 填写Video配置，通过修改config.NetEnv来设置是使用内网IP还是外网IP
 	if config.Video["video_prefix"] == "" {
 		if config.NetEnv == "internal" {
 			config.Video["video_prefix"] = "http://" + getInternalIP() + config.Port + "/douyin/video/"
@@ -43,25 +41,19 @@ func init() {
 	}
 }
 
-func Hash(s string) string {
-	// return sha256(s + config.Secret)
-	s += config.Secret
-	hash := sha256.New()
-	hash.Write([]byte(s))
-	return fmt.Sprintf("%x", hash.Sum(nil))
-}
-
+// Handle 处理错误
 func Handle(e error) {
 	if e != nil {
 		log.Panicf("[ERR] Tiktok DAO Layer Error : %v", e)
 	}
 }
 
+// getInternalIP 获取内网IP
 func getInternalIP() string {
 	conn, err := net.Dial("udp", "8.8.8.8:80")
 	Handle(err)
 	defer func(conn net.Conn) {
-		err := conn.Close()
+		err = conn.Close()
 		Handle(err)
 	}(conn)
 	localAddr := conn.LocalAddr().(*net.UDPAddr).String()
@@ -69,6 +61,7 @@ func getInternalIP() string {
 	return addr
 }
 
+// getExternalIP 使用API获取外网IP
 func getExternalIP() string {
 	type IP struct {
 		Query string
@@ -76,7 +69,7 @@ func getExternalIP() string {
 	req, err := http.Get("http://ip-api.com/json/")
 	Handle(err)
 	defer func(Body io.ReadCloser) {
-		err := Body.Close()
+		err = Body.Close()
 		Handle(err)
 	}(req.Body)
 	body, err := ioutil.ReadAll(req.Body)

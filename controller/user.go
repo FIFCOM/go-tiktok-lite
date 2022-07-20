@@ -77,7 +77,7 @@ func UserInfo(c *gin.Context) {
 	userId := c.Query("user_id")
 	daoUser, _ := service.ParseToken(token)
 	user := ConvertUser(&daoUser) // 格式转换
-
+	// 判断用户id是否一致，如果一致则有效
 	if userId == strconv.FormatInt(daoUser.Id, 10) {
 		c.JSON(http.StatusOK, UserResponse{
 			Response: Response{StatusCode: 0},

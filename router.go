@@ -6,16 +6,13 @@ import (
 )
 
 func initRouter(r *gin.Engine) {
-	// public directory is used to serve static resources
-	r.Static("/static", "./public")
-
 	apiRouter := r.Group("/douyin")
 
-	// static files
+	// 静态文件
 	apiRouter.Static("/video/", "./public/video/")
 	apiRouter.Static("/cover/", "./public/cover/")
 
-	// basic apis
+	// 基础API接口
 	apiRouter.GET("/feed/", controller.Feed)
 	apiRouter.GET("/user/", controller.UserInfo)
 	apiRouter.POST("/user/register/", controller.Register)
@@ -23,13 +20,13 @@ func initRouter(r *gin.Engine) {
 	apiRouter.POST("/publish/action/", controller.Publish)
 	apiRouter.GET("/publish/list/", controller.PublishList)
 
-	// extra apis - I
+	// 扩展API接口I
 	apiRouter.POST("/favorite/action/", controller.FavoriteAction)
 	apiRouter.GET("/favorite/list/", controller.FavoriteList)
 	apiRouter.POST("/comment/action/", controller.CommentAction)
 	apiRouter.GET("/comment/list/", controller.CommentList)
 
-	// extra apis - II
+	// 扩展API接口II
 	apiRouter.POST("/relation/action/", controller.RelationAction)
 	apiRouter.GET("/relation/follow/list/", controller.FollowList)
 	apiRouter.GET("/relation/follower/list/", controller.FollowerList)

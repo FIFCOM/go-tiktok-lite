@@ -14,8 +14,9 @@ type FeedResponse struct {
 	NextTime  int64   `json:"next_time,omitempty"`
 }
 
-// Feed same demo video list for every request
+// Feed 倒序获取视频流
 func Feed(c *gin.Context) {
+	// 根据latestTime获取视频流的最新视频
 	latestTime := c.Query("latest_time")
 	var feedTime time.Time
 	if latestTime != "0" {
@@ -25,6 +26,7 @@ func Feed(c *gin.Context) {
 		feedTime = time.Now()
 	}
 	videoSvc := service.VideoSvc{}
+	// 将[]dao.Video转换为[]controller.Video
 	daoVideos := videoSvc.GetVideoListByTime(time.Now())
 	var videos []Video
 	for _, daoVideo := range daoVideos {

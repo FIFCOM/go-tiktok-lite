@@ -13,31 +13,37 @@ import (
 type VideoSvc struct {
 }
 
+// GetVideoById 由视频id获取视频
 func (vs *VideoSvc) GetVideoById(id int64) dao.Video {
 	video, err := dao.GetVideoById(id)
 	Handle(err)
 	return video
 }
 
+// GetVideoListByUser 由用户id获取ta发布的所有视频
 func (vs *VideoSvc) GetVideoListByUser(userId int64) []dao.Video {
 	videos, err := dao.GetVideoListByUser(userId)
 	Handle(err)
 	return videos
 }
 
+// GetVideoListByTime 获取视频列表并限制最新视频的发布时间
 func (vs *VideoSvc) GetVideoListByTime(time time.Time) []dao.Video {
 	videos, err := dao.GetVideoListByTime(time)
 	Handle(err)
 	return videos
 }
 
+// SaveVideo 保存视频
 func (vs *VideoSvc) SaveVideo(c *gin.Context, userId int64, title string) error {
+	// 获取视频名称、类型的同时保存视频
 	videoName, videoType, err := vs.getVideoName(c, userId)
+	// 获取视频封面名称的同时保存视频封面
 	coverName := vs.getCoverName(videoName, videoType)
 	video := dao.Video{
 		UserId:      userId,
 		Title:       title,
-		VideoUrl:    videoName + videoType,
+		VideoUrl:    videoName + videoType, // 视频地址是视频名称 + 视频类型
 		CoverUrl:    coverName,
 		PublishTime: time.Now(),
 	}

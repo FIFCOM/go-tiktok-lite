@@ -19,6 +19,7 @@ type Video struct {
 	PublishTime time.Time // 发布时间
 }
 
+// GetVideoById 获取指定视频的信息
 func GetVideoById(id int64) (Video, error) {
 	var video Video
 	err := DB.Where("id = ?", id).First(&video).Error
@@ -26,6 +27,7 @@ func GetVideoById(id int64) (Video, error) {
 	return video, err
 }
 
+// GetVideoListByUser 获取指定用户的视频
 func GetVideoListByUser(userId int64) ([]Video, error) {
 	var videos []Video
 	err := DB.Where("user_id = ?", userId).Find(&videos).Error
@@ -33,7 +35,9 @@ func GetVideoListByUser(userId int64) ([]Video, error) {
 	return videos, err
 }
 
+// GetVideoListByTime 获取指定时间之前的视频
 func GetVideoListByTime(time time.Time) ([]Video, error) {
+	// 使用time限制最新视频的时间
 	limit, _ := strconv.ParseInt(config.Video["limit"], 10, 64)
 	videos := make([]Video, limit)
 	err := DB.Where("publish_time < ?", time).
@@ -43,19 +47,22 @@ func GetVideoListByTime(time time.Time) ([]Video, error) {
 	return videos, err
 }
 
+// InsertVideo 插入视频至数据库
 func InsertVideo(video *Video) error {
 	err := DB.Create(&video).Error
 	Handle(err)
 	return err
 }
 
+// SaveVideo 保存视频
 func SaveVideo(c *gin.Context, data *multipart.FileHeader, path string) error {
-	// 保存视频
+	// gin.Context.SaveUploadedFile()可保存视频
 	err := c.SaveUploadedFile(data, path)
 	Handle(err)
 	return err
 }
 
+// SaveCover 保存视频封面
 func SaveCover(filename string, filetype string) string {
 	// 使用ffmpeg提取视频第一帧作为封面
 	inputFile := fmt.Sprintf(config.Video["video_dir_fmt"], filename, filetype)
