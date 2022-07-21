@@ -22,6 +22,17 @@ func FavoriteAction(userid int64, videoid int64, actiontype int32) {
 	}
 }
 
-func FavoriteList() {
+func (fs *FavoriteSvc) FavoriteList(userid int64) []dao.Video {
+	datas, _ := dao.GetFavorite(userid)
 
+	svc := VideoSvc{}
+	var results []dao.Video
+
+	for _, data := range datas {
+		result := svc.GetVideoById(data.VideoId)
+
+		results = append(results, result)
+	}
+
+	return results
 }

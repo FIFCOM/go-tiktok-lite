@@ -4,7 +4,7 @@ package dao
 
 // Favorite 表：用户ID，点赞视频ID
 type Favorite struct {
-	FId     int64
+	Id      int64
 	UserId  int64
 	VideoId int64
 }
@@ -22,9 +22,9 @@ func DeleteFavorite(data Favorite) {
 }
 
 // GetFavorite 查找一个人的所有喜爱的视频
-func GetFavorite(user int64) ([]Favorite, error) {
+func GetFavorite(userid int64) ([]Favorite, error) {
 	var results []Favorite
-	err := DB.Where("UserId = ?", user).Find(&results).Error
+	err := DB.Where("UserId = ?", userid).Find(&results).Error
 
 	Handle(err)
 	return results, err
