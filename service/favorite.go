@@ -8,7 +8,7 @@ import (
 type FavoriteSvc struct {
 }
 
-func FavoriteAction(userid int64, videoid int64, actiontype int32) {
+func (fs *FavoriteSvc) FavoriteAction(userid int64, videoid int64, actiontype int32) {
 	data := dao.Favorite{UserId: userid, VideoId: videoid}
 
 	if actiontype == 1 {

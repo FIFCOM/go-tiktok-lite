@@ -8,6 +8,7 @@ import (
 )
 
 // FavoriteAction no practical effect, just check if token is valid
+
 func FavoriteAction(c *gin.Context) {
 	token := c.Query("token")
 
@@ -23,7 +24,9 @@ func FavoriteAction(c *gin.Context) {
 	userid, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
 	videoid, _ := strconv.ParseInt(c.Query("video_id"), 10, 64)
 
-	service.FavoriteAction(userid, videoid, actiontype)
+	svc := service.FavoriteSvc{}
+
+	svc.FavoriteAction(userid, videoid, actiontype)
 }
 
 // FavoriteList all users have same favorite video list
