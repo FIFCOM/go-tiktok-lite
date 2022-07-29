@@ -1,8 +1,6 @@
 package dao
 
-//用户点赞的视频
-
-// Comment 表：用户ID，点赞视频ID，
+// Comment 表：用户id，评论视频id，评论内容，评论时间（未加入）
 type Comment struct {
 	Id          int64
 	UserId      int64
