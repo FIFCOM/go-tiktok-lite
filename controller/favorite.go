@@ -18,15 +18,15 @@ func FavoriteAction(c *gin.Context) {
 		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 	}
 
-	actiontype64, _ := strconv.ParseInt(c.Query("action_type"), 10, 32)
-	actiontype := int32(actiontype64)
+	actionType64, _ := strconv.ParseInt(c.Query("action_type"), 10, 32)
+	actionType := int32(actionType64)
 
-	userid, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
-	videoid, _ := strconv.ParseInt(c.Query("video_id"), 10, 64)
+	userId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
+	videoId, _ := strconv.ParseInt(c.Query("video_id"), 10, 64)
 
 	svc := service.FavoriteSvc{}
 
-	svc.FavoriteAction(userid, videoid, actiontype)
+	svc.FavoriteAction(userId, videoId, actionType)
 }
 
 // FavoriteList all users have same favorite video list

@@ -1,8 +1,12 @@
 package controller
 
 import (
+	"fmt"
+	"github.com/FIFCOM/go-tiktok-lite/service"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 type CommentListResponse struct {
@@ -18,30 +22,54 @@ type CommentActionResponse struct {
 // CommentAction no practical effect, just check if token is valid
 func CommentAction(c *gin.Context) {
 	token := c.Query("token")
+	daoUser, _ := service.ParseToken(token) //token识别来自dao层
+	// 判断token是否有效
+	if daoUser.Id == 0 {
+		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+		return
+	}
+
 	actionType := c.Query("action_type")
 
-	if user, exist := usersLoginInfo[token]; exist {
-		if actionType == "1" {
-			text := c.Query("comment_text")
-			c.JSON(http.StatusOK, CommentActionResponse{Response: Response{StatusCode: 0},
-				Comment: Comment{
-					Id:         1,
-					User:       user,
-					Content:    text,
-					CreateDate: "05-01",
-				}})
-			return
-		}
-		c.JSON(http.StatusOK, Response{StatusCode: 0})
-	} else {
-		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+	svc := service.CommentSvc{}
+
+	if actionType == "1" { //发布评论
+		userId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
+		videoId, _ := strconv.ParseInt(c.Query("video_id"), 10, 64)
+		text := c.Query("comment_text")
+		data := svc.CommentNew(userId, videoId, text)
+
+		c.JSON(http.StatusOK, CommentActionResponse{Response: Response{StatusCode: 0},
+			Comment: Comment{
+				Id:         data.Id,
+				Content:    text,
+				User:       ConvertUser(&daoUser),
+				CreateDate: fmt.Sprintf("%d-%d", time.Now().Month(), time.Now().Day()),
+			}})
+
+		return
+	} else { //删除评论
+		commentId, _ := strconv.ParseInt(c.Query("comment_id"), 10, 64)
+
+		svc.CommentDelete(commentId)
 	}
+	//c.JSON(http.StatusOK, Response{StatusCode: 0})
+
 }
 
 // CommentList all videos have same demo comment list
 func CommentList(c *gin.Context) {
+	videoId, _ := strconv.ParseInt(c.Query("video_id"), 10, 64)
+
+	svc := service.CommentSvc{}
+
+	data := svc.CommentList(videoId)
+	var result []Comment
+	for _, v := range data {
+		result = append(result, ConvertComment(&v))
+	}
 	c.JSON(http.StatusOK, CommentListResponse{
 		Response:    Response{StatusCode: 0},
-		CommentList: DemoComments,
+		CommentList: result,
 	})
 }

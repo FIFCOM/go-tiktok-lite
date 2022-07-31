@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/FIFCOM/go-tiktok-lite/config"
 	"github.com/FIFCOM/go-tiktok-lite/dao"
 	"github.com/FIFCOM/go-tiktok-lite/service"
@@ -64,5 +65,16 @@ func ConvertUser(user *dao.User) User {
 		FollowCount:   relationSvc.LenUserFocus(user.Id),
 		FollowerCount: relationSvc.LenUserFans(user.Id),
 		IsFollow:      true, // TODO: 判断是否关注
+	}
+}
+
+func ConvertComment(comment *dao.Comment) Comment {
+	var svc service.UserSvc
+	user := svc.GetUserById(comment.UserId)
+	return Comment{
+		Id:         comment.Id,
+		User:       ConvertUser(&user),
+		Content:    comment.CommentText,
+		CreateDate: fmt.Sprintf("%d-%d", comment.CreateDate.Month(), comment.CreateDate.Day()),
 	}
 }
