@@ -5,6 +5,7 @@ import (
 )
 
 type RelationSvc struct {
+	MyId int64
 }
 
 // GetUserFocus 根据id得到用户的关注列表
@@ -43,6 +44,6 @@ func (us *RelationSvc) RelationAction(userId, toUserId, actionType int64) {
 }
 
 // IsFollow 判断myId有没有关注toId
-func (us *RelationSvc) IsFollow(myId, toId int64) bool {
-	return dao.IsFollow(myId, toId)
+func (us *RelationSvc) IsFollow(toId int64) bool {
+	return dao.IsFollow(us.MyId, toId)
 }

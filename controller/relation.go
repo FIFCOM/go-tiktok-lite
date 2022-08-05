@@ -76,12 +76,12 @@ func FollowList(c *gin.Context) {
 
 // FollowerList 返回一个响应列表
 func FollowerList(c *gin.Context) {
-	svcR := service.RelationSvc{}
-	svcU := service.UserSvc{}
-
 	// 取得当前用户的id
 	token := c.Query("token")
 	daoUser, _ := service.ParseToken(token)
+
+	svcR := service.RelationSvc{MyId: daoUser.Id}
+	svcU := service.UserSvc{}
 
 	// 得到当前id的所有关注列表
 	follower := svcR.GetUserFans(daoUser.Id)
@@ -96,7 +96,7 @@ func FollowerList(c *gin.Context) {
 			Name:          svcU.GetUserById(followerUserId).Name,
 			FollowCount:   svcR.LenUserFocus(followerUserId),
 			FollowerCount: svcR.LenUserFans(followerUserId),
-			IsFollow:      svcR.IsFollow(daoUser.Id, followerUserId), //判断一下当前粉丝，自己有没有关注他
+			IsFollow:      svcR.IsFollow(followerUserId), //判断一下当前粉丝，自己有没有关注他
 		}
 		userList = append(userList, tmp)
 	}

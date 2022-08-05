@@ -74,14 +74,15 @@ func Login(c *gin.Context) {
 
 func UserInfo(c *gin.Context) {
 	token := c.Query("token")
-	userId := c.Query("user_id")
-	daoUser, _ := service.ParseToken(token)
-	user := ConvertUser(&daoUser) // 格式转换
-	// 判断用户id是否一致，如果一致则有效
-	if userId == strconv.FormatInt(daoUser.Id, 10) {
+	userSvc := service.UserSvc{}
+	userId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
+	myUser, _ := service.ParseToken(token)
+	queryUser := userSvc.GetUserById(userId)
+	// 判断用户id是否存在，存在即登录
+	if myUser.Id != 0 {
 		c.JSON(http.StatusOK, UserResponse{
 			Response: Response{StatusCode: 0},
-			User:     user,
+			User:     ConvertUser(&queryUser, myUser.Id),
 		})
 	} else {
 		c.JSON(http.StatusOK, UserResponse{

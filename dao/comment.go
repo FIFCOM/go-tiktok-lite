@@ -21,7 +21,7 @@ func InsertComment(data *Comment) error {
 // DeleteComment 删除数据
 func DeleteComment(commentId int64) {
 	data := Comment{Id: commentId} //初始化一个id = commentId 的结构
-	DB.Where("Id = ?", commentId).Delete(&data)
+	DB.Where("id = ?", commentId).Delete(&data)
 }
 
 // GetComment 查找一个视频的所有评论

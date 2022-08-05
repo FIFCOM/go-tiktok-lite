@@ -41,14 +41,16 @@ func Publish(c *gin.Context) {
 func PublishList(c *gin.Context) {
 	// 发布列表通过userId查询
 	userId := c.Query("user_id")
+	token := c.Query("token")
 	id, _ := strconv.ParseInt(userId, 10, 64)
 	svc := service.VideoSvc{}
+	myUser, _ := service.ParseToken(token)
 	// 获取用户发布的视频列表
 	daoVideos := svc.GetVideoListByUser(id)
 	var videos []Video
 	// 将[]dao.Video转换为[]controller.Video
 	for _, daoVideo := range daoVideos {
-		video := ConvertVideo(&daoVideo)
+		video := ConvertVideo(&daoVideo, myUser.Id)
 		videos = append(videos, video)
 	}
 	c.JSON(http.StatusOK, VideoListResponse{

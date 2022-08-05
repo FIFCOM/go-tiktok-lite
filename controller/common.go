@@ -39,32 +39,37 @@ type User struct {
 }
 
 // ConvertVideo 将dao.Video转换为controller.Video
-func ConvertVideo(video *dao.Video) Video {
+func ConvertVideo(video *dao.Video, myId int64) Video {
 	var userSvc service.UserSvc
+	var commentSvc service.CommentSvc
+	var favoriteSvc service.FavoriteSvc
 	user := userSvc.GetUserById(video.UserId)
 	videoPrefix := config.Video["video_prefix"]
 	coverPrefix := config.Video["cover_prefix"]
+
 	return Video{
 		Id:            video.Id,
-		Author:        ConvertUser(&user),
+		Author:        ConvertUser(&user, 0),
 		Title:         video.Title,
 		PlayUrl:       videoPrefix + video.VideoUrl,
 		CoverUrl:      coverPrefix + video.CoverUrl,
-		FavoriteCount: 666,  // TODO: 获取收藏数
-		CommentCount:  666,  // TODO: 获取评论数
-		IsFavorite:    true, // TODO: 判断是否点赞
+		FavoriteCount: int64(len(favoriteSvc.FavoriteListByVideo(video.Id))),
+		CommentCount:  int64(len(commentSvc.CommentList(video.Id))),
+		IsFavorite:    favoriteSvc.IsFavorite(myId, video.Id),
 	}
 }
 
 // ConvertUser 将dao.User转换为controller.User
-func ConvertUser(user *dao.User) User {
-	var relationSvc service.RelationSvc
+func ConvertUser(user *dao.User, myId int64) User {
+	relationSvc := service.RelationSvc{
+		MyId: myId,
+	}
 	return User{
 		Id:            user.Id,
 		Name:          user.Name,
 		FollowCount:   relationSvc.LenUserFocus(user.Id),
 		FollowerCount: relationSvc.LenUserFans(user.Id),
-		IsFollow:      true, // TODO: 判断是否关注
+		IsFollow:      relationSvc.IsFollow(user.Id),
 	}
 }
 
@@ -73,7 +78,7 @@ func ConvertComment(comment *dao.Comment) Comment {
 	user := svc.GetUserById(comment.UserId)
 	return Comment{
 		Id:         comment.Id,
-		User:       ConvertUser(&user),
+		User:       ConvertUser(&user, 1),
 		Content:    comment.CommentText,
 		CreateDate: fmt.Sprintf("%d-%d", comment.CreateDate.Month(), comment.CreateDate.Day()),
 	}

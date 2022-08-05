@@ -34,18 +34,18 @@ func CommentAction(c *gin.Context) {
 	svc := service.CommentSvc{}
 
 	if actionType == "1" { //发布评论
-		userId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
 		videoId, _ := strconv.ParseInt(c.Query("video_id"), 10, 64)
 		text := c.Query("comment_text")
-		data := svc.CommentNew(userId, videoId, text)
+		data := svc.CommentNew(daoUser.Id, videoId, text)
 
 		c.JSON(http.StatusOK, CommentActionResponse{Response: Response{StatusCode: 0},
 			Comment: Comment{
 				Id:         data.Id,
 				Content:    text,
-				User:       ConvertUser(&daoUser),
+				User:       ConvertUser(&daoUser, daoUser.Id),
 				CreateDate: fmt.Sprintf("%d-%d", time.Now().Month(), time.Now().Day()),
-			}})
+			},
+		})
 
 		return
 	} else { //删除评论

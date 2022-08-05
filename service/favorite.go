@@ -8,22 +8,22 @@ import (
 type FavoriteSvc struct {
 }
 
-func (fs *FavoriteSvc) FavoriteAction(userid int64, videoid int64, actiontype int32) {
-	data := dao.Favorite{UserId: userid, VideoId: videoid}
+func (fs *FavoriteSvc) FavoriteAction(userid int64, videoId int64, actionType int32) {
+	data := dao.Favorite{UserId: userid, VideoId: videoId}
 
-	if actiontype == 1 {
-		dao.InsertFavorite(data)
+	if actionType == 1 {
+		_ = dao.InsertFavorite(&data)
 
-	} else if actiontype == 2 {
-		dao.DeleteFavorite(data)
+	} else if actionType == 2 {
+		dao.DeleteFavorite(&data)
 
 	} else {
 		log.Fatalln("action_type is wrong type!!!")
 	}
 }
 
-func (fs *FavoriteSvc) FavoriteList(userid int64) []dao.Video {
-	favoriteVideos, _ := dao.GetFavorite(userid)
+func (fs *FavoriteSvc) FavoriteListByUser(userid int64) []dao.Video {
+	favoriteVideos, _ := dao.GetFavoriteByUser(userid)
 
 	svc := VideoSvc{}
 	var results []dao.Video
@@ -35,4 +35,31 @@ func (fs *FavoriteSvc) FavoriteList(userid int64) []dao.Video {
 	}
 
 	return results
+}
+
+func (fs *FavoriteSvc) FavoriteListByVideo(videoId int64) []dao.User {
+	favoriteUsers, _ := dao.GetFavoriteByVideo(videoId)
+
+	svc := UserSvc{}
+	var results []dao.User
+
+	for _, data := range favoriteUsers {
+		result := svc.GetUserById(data.UserId)
+
+		results = append(results, result)
+	}
+
+	return results
+}
+
+func (fs *FavoriteSvc) IsFavorite(userId, videoId int64) bool {
+	list, _ := dao.GetFavoriteByUser(userId)
+	ret := false
+	for _, data := range list {
+		if data.VideoId == videoId {
+			ret = true
+			break
+		}
+	}
+	return ret
 }

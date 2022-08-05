@@ -58,3 +58,23 @@ values(3,'测试视频3','test3.mp4','test3.png','2022-03-01 00:00:00');
 # 发布时间为："2022-04-01 00:00:00";
 insert into videos(user_id,title,video_url,cover_url,publish_time)
 values(1,'测试视频4','test4.mp4','test4.png','2022-04-01 00:00:00');
+
+# comments 评论表
+drop table if exists comments;
+create table comments(
+    id int not null auto_increment comment '自增主键',
+    user_id int not null comment '用户Id',
+    video_id int not null comment '视频Id',
+    comment_text varchar(255) not null comment '评论内容',
+    create_date datetime not null comment '发布时间',
+    primary key(id)
+) engine=InnoDB default charset=utf8 comment '评论表';
+
+# favorites 点赞表
+drop table if exists favorites;
+create table favorites(
+    id int not null auto_increment comment '自增主键',
+    user_id int not null comment '用户Id',
+    video_id int not null comment '视频Id',
+    primary key(id)
+) engine=InnoDB default charset=utf8 comment '点赞表';

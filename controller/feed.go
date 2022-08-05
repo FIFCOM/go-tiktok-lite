@@ -18,6 +18,8 @@ type FeedResponse struct {
 func Feed(c *gin.Context) {
 	// 根据latestTime获取视频流的最新视频
 	latestTime := c.Query("latest_time")
+	token := c.Query("token")
+	myUser, _ := service.ParseToken(token)
 	var feedTime time.Time
 	if latestTime != "0" {
 		latest, _ := strconv.ParseInt(latestTime, 10, 64)
@@ -30,7 +32,7 @@ func Feed(c *gin.Context) {
 	daoVideos := videoSvc.GetVideoListByTime(time.Now())
 	var videos []Video
 	for _, daoVideo := range daoVideos {
-		video := ConvertVideo(&daoVideo)
+		video := ConvertVideo(&daoVideo, myUser.Id)
 		videos = append(videos, video)
 	}
 	c.JSON(http.StatusOK, FeedResponse{
