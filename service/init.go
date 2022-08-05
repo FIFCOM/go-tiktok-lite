@@ -25,7 +25,9 @@ func GetToken(user dao.User) string {
 // ParseToken 解析用户token，返回dao.User
 func ParseToken(token string) (user dao.User, err error) {
 	id, err := Decrypt(token, Hash(config.Secret))
-	Handle(err)
+	if id == "" {
+		id = "0"
+	}
 	user.Id, err = strconv.ParseInt(id, 10, 64)
 	Handle(err)
 	return dao.GetUserById(user.Id)

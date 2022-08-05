@@ -10,6 +10,9 @@ type User struct {
 // GetUserById 由ID获取用户结构体
 func GetUserById(id int64) (User, error) {
 	user := User{}
+	if id == 0 {
+		return user, nil
+	}
 	err := DB.Where("id = ?", id).First(&user).Error
 	Handle(err)
 	return user, err
